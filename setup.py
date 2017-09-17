@@ -8,6 +8,7 @@ setup(name='ezy-chord',
       packages=['ezy_chord'],
       url='https://github.com/EzyInsights/ezy-chord/',
       keywords=['redis', 'celery', 'python'],
+      test_suite='tests',
       classifiers=[
           'Operating System :: POSIX',
           'Environment :: Console',
