@@ -1,13 +1,38 @@
 # ezy-chord
-Celery chord implementation, which works with eventlet
+Celery chord implementation, which works with eventlet. 
+
+## Why?
+
+In celery 4 chord implementation is completely broken. It uses Redis PUBSUB functionality, which does not work with 
+eventlet/gevent
+
+## How does it work?
+
+1. When you create a chord, it runs all subtasks at once and stores number of subtasks in Redis
+2. Each time you complete a subtask you need to call `chord_check` method, which will store subtask result in Redis 
+and decrement task counter
+3. When last subtask is completed and task counter is 0, `chord_check` runs collection task and sends all results to 
+this task
+ 
 
 ## Usage
 
 In your app initializer:
 
-```
+```python
+import redis
+from ezy_chord import EzyChord
+from celery import Celery
+
 app = Celery('myapp')
-app.ezy_chord = EzyChord(app)
+app.ezy_chord = EzyChord(
+    app,
+    redis_instance=redis.StrictRedis(
+        password='test',
+        host='localhost',
+        port=6379,
+        db=0)
+)
 ```
 
 In your tasks.py:
